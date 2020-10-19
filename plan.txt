@@ -1,0 +1,11 @@
+Pull all data
+
+Determine lowest price and average
+
+day
+ fueltypes
+    locations
+
+
+
+date price location
