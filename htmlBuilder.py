@@ -7,6 +7,24 @@ def tabs(number):
         tabs += '\t'
     return tabs
 
+def header():
+    header = f'''
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Fuel Watch</title>
+        </head>
+        <body>
+    '''
+    return header
+
+def footer():
+    footer = f'''
+        </body>
+    </html>    
+    '''
+    return footer
+
 def buildTableRow(data):
     rows = str()
     for d in data:
