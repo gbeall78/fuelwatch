@@ -1,5 +1,6 @@
 import feedparser
 import workers
+import htmlBuilder
 from pprint import pprint
 from flask import Flask
 
@@ -19,11 +20,11 @@ def buildPage():
 
     scrapedData = list()
     scrapedData = workers.getFuelData()
-    requiredData = workers.filterData(scrapedData)
+    requiredData = workers.filterData(scrapedData, parameters={'Count':3})
 
     page = f'''
     Fuel type: {workers.FuelTypes[requiredData[0]["fuelType"]]}
-    {workers.buildTable(["Price","Name","Address","Location"],requiredData)}
+    {htmlBuilder.buildTable(["Price","Name","Address","Location"],requiredData)}
     '''
     return page
 

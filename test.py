@@ -1,13 +1,10 @@
 import exceptions
 from pprint import pprint
 import workers
+import htmlBuilder
 from flask import Flask
 
-
-
-@app.route('/')
-def hello():
-    return '<h1>Hello</h1>'
+app = Flask(__name__)
 
 def buildTableTest():
     testDataHeader = ["Price", "Trading Name", "Address", "Location"]
@@ -24,23 +21,23 @@ def buildTableTest():
 
     try: #Test basic functionality
         #Weird style
-        #buildTable(testDataHeader, testDataServo, style="test:test:test")
+        #htmlBuilder.buildTable(testDataHeader, testDataServo, style="test:test:test")
 
         #missing ;
-        #buildTable(testDataHeader, testDataServo, style="test:test; test2:test2")
-        #buildTable(testDataHeader, testDataServo, style="test:test test2:test2")
-        #buildTable(testDataHeader, testDataServo, style="test:test")
+        #htmlBuilder.buildTable(testDataHeader, testDataServo, style="test:test; test2:test2")
+        #htmlBuilder.buildTable(testDataHeader, testDataServo, style="test:test test2:test2")
+        #htmlBuilder.buildTable(testDataHeader, testDataServo, style="test:test")
         
         #Valid style
-        #buildTable(testDataHeader, testDataServo, style="test:test;")
+        #htmlBuilder.buildTable(testDataHeader, testDataServo, style="test:test;")
 
         #Bad class name
-        #buildTable(testDataHeader, testDataServo, style="test:test;", className="34")
-        #buildTable(testDataHeader, testDataServo, style="test:test;", className="w-ord")
+        #htmlBuilder.buildTable(testDataHeader, testDataServo, style="test:test;", className="34")
+        #htmlBuilder.buildTable(testDataHeader, testDataServo, style="test:test;", className="w-ord")
         
         #valid class name
-        buildTable(testDataHeader, testDataServo, style="test:test;", className="_word")
-        buildTable(testDataHeader, testDataServo, style="test:test;", className="word")
+        htmlBuilder.buildTable(testDataHeader, testDataServo, style="test:test;", className="_word")
+        htmlBuilder.buildTable(testDataHeader, testDataServo, style="test:test;", className="word")
     except exceptions.invalidStyleParameter:
         pprint('Invalid style parameter given.')
     except exceptions.invalidClassParameter:
@@ -51,9 +48,9 @@ def buildTableTest():
         try: #Test Data header validity
             
             #Too few items
-            buildTable([], testDataServo)
+            htmlBuilder.buildTable([], testDataServo)
             #Too many items
-            buildTable([], testDataServo)
+            htmlBuilder.buildTable([], testDataServo)
         except exceptions.noTableHeaderException:
             pprint("Table header was blank")
         except exceptions.tableHeaderDataSizeMismatchException:
@@ -64,11 +61,11 @@ def buildTableTest():
             try: #Test data validity
 
 
-                buildTable(testDataHeader, testDataServo)
-                buildTable(testDataHeader, testDataServo)
-                buildTable(testDataHeader, testDataServo)
-                buildTable(testDataHeader, testDataServo)
-                buildTable(testDataHeader, testDataServo)
+                htmlBuilder.buildTable(testDataHeader, testDataServo)
+                htmlBuilder.buildTable(testDataHeader, testDataServo)
+                htmlBuilder.buildTable(testDataHeader, testDataServo)
+                htmlBuilder.buildTable(testDataHeader, testDataServo)
+                htmlBuilder.buildTable(testDataHeader, testDataServo)
             except exceptions.invalidDataException:
                 pprint('Invalid data.')
             except:
@@ -90,6 +87,7 @@ def getFuelDataTest():
 
     return fuelData
 
+@app.route('/')
 def filterTest():
 
     fuelData = getFuelDataTest()
@@ -105,15 +103,17 @@ def filterTest():
     #requiredData = workers.filterData(fuelData, parameters={'Suburb':'Perth'})
     requiredData = workers.filterData(fuelData, parameters={'FuelType':'Diesel','Day':'yesterday'})
     
-    strFT = f'Fuel type: {workers.FuelTypes[requiredData[0]["fuelType"]]}\n{workers.buildTable(["Price","Name","Address","Location"],requiredData)}'
+    strFT = f'Fuel type: {workers.FuelTypes[requiredData[0]["fuelType"]]}\n{htmlBuilder.buildTable(["Price","Name","Address","Location"],requiredData)}'
     return strFT
     #print(strFT)
     #print(workers.buildTable(["Price","Name","Address","Location"],requiredData))
 
 def runTest():
+    app.run(debug=True, host='0.0.0.0')
+
     #pprint(getPrices())
     #pprint(userLocation().city)
-    # buildTableTest()    
+    #buildTableTest()    
 
     filterTest()
 
