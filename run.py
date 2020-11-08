@@ -23,8 +23,10 @@ def buildPage():
     requiredData = workers.filterData(scrapedData, parameters={'Count':3})
 
     page = f'''
-    Fuel type: {workers.FuelTypes[requiredData[0]["fuelType"]]}
+    {htmlBuilder.header()}
+    <div>Fuel type: {workers.FuelTypes[requiredData[0]["fuelType"]]}</div>
     {htmlBuilder.buildTable(["Price","Name","Address","Location"],requiredData)}
+    {htmlBuilder.footer()}
     '''
     return page
 

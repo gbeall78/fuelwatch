@@ -185,7 +185,7 @@ def filterData(data, parameters={}):
     
     #Check if the requested number of items doesn't exceed the number items that exist.
     #Set count to the lowest option.
-    count = len(data[dayIndex][ftIndex]) 
+    count = len(data[dayIndex][ftIndex]['stations']) 
     if 'Count' in parameters:
         if parameters['Count'] < count:
             count = parameters['Count']
