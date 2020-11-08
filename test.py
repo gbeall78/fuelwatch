@@ -1,6 +1,13 @@
 import exceptions
 from pprint import pprint
-from workers import getPrices, userLocation, buildTable
+import workers
+from flask import Flask
+
+
+
+@app.route('/')
+def hello():
+    return '<h1>Hello</h1>'
 
 def buildTableTest():
     testDataHeader = ["Price", "Trading Name", "Address", "Location"]
@@ -69,11 +76,46 @@ def buildTableTest():
             else:
                 pprint('All Tests passed! Have a cookie!')
 
+def getFuelDataTest():
+    fuelData = list()
+    fuelData = workers.getFuelData()
 
+    daysCollected = len(fuelData)
+    if(daysCollected == 3):
+        pprint("Yesterdays, todays and tomorrows data has been collected.")
+    elif(daysCollected == 2 and not workers.tomorrowReleased()):
+        pprint("Before 2:30PM. Yesterdays and todays data have been collected.")
+    else:
+        return None
+
+    return fuelData
+
+def filterTest():
+
+    fuelData = getFuelDataTest()
+    if(fuelData == None):
+        pprint("Invalid fuel data list")
+        exit()
+
+    #requiredData = workers.filterData(fuelData)
+    #requiredData = workers.filterData(fuelData, parameters={'Count':600})
+    #requiredData = workers.filterData(fuelData, parameters={'Day':'Today'})
+    #requiredData = workers.filterData(fuelData, parameters={'Day':'yesterday'})
+    #requiredData = workers.filterData(fuelData, parameters={'FuelType':'Electric'})
+    #requiredData = workers.filterData(fuelData, parameters={'Suburb':'Perth'})
+    requiredData = workers.filterData(fuelData, parameters={'FuelType':'Diesel','Day':'yesterday'})
+    
+    strFT = f'Fuel type: {workers.FuelTypes[requiredData[0]["fuelType"]]}\n{workers.buildTable(["Price","Name","Address","Location"],requiredData)}'
+    return strFT
+    #print(strFT)
+    #print(workers.buildTable(["Price","Name","Address","Location"],requiredData))
 
 def runTest():
     #pprint(getPrices())
     #pprint(userLocation().city)
-    buildTableTest()    
+    # buildTableTest()    
+
+    filterTest()
+
 
 runTest()

@@ -1,49 +1,31 @@
 import feedparser
 import workers
 from pprint import pprint
+from flask import Flask
 
-Day = ['yesterday'] #, 'today', 'tomorrow']
-
-FuelTypes = {
-    '1' : 'Unleaded Petrol',
-}
 '''
-    '2' : 'Premium Unleaded',
-    '4' : 'Diesel',
-    '5' : 'LPG',
-    '6' : '98 RON',
-    '10' : 'E85',
-    '11' : 'Brand diesel',
-}
+    Show opening page
+    Collect data. 
+        ?Could this be done twice per day and stored locally for faster lookup?
+        Better yet, retrieve once, after 2:30pm but use the data for tomorrow as well.
+    Show progress e.g. retrieving data, acquiring location, locating closest options
+    Reload page with data
 '''
 
-    
-scrapedData = list()
+app = Flask(__name__)
 
-for d in Day:
-    dList = list()
-    for ft in FuelTypes:
-        scrape = workers.getPrices(day=d,product_id=ft, suburb='Nollamara')
-        print(type(scrape))
-        fList = list()
-        s=sorted(scrape['items'], key=lambda item : item['price'], reverse=True)
+@app.route('/')
+def buildPage():
 
-        for i in s:
-            servo = dict()
-            servo = {
-                'price' : i['price'],
-                'brand' : i['brand'],
-                'trading-name' : i['trading-name'],
-                'location' : i['location'],
-                'address' : i['address'],
-                'longitude' : i['longitude'],
-                'latitude' : i['latitude'],
-            }
-            
-            fList.append(servo)
-        dList.append(fList)
-    scrapedData.append(dList)
+    scrapedData = list()
+    scrapedData = workers.getFuelData()
+    requiredData = workers.filterData(scrapedData)
 
-#requiredData = filter(scrapedData)
+    page = f'''
+    Fuel type: {workers.FuelTypes[requiredData[0]["fuelType"]]}
+    {workers.buildTable(["Price","Name","Address","Location"],requiredData)}
+    '''
+    return page
 
-pprint(workers.buildTableRow(scrapedData[0][0]))
+if __name__ == '__main__':
+  app.run(debug=True, host='0.0.0.0')
