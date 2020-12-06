@@ -1,6 +1,6 @@
 import feedparser
-import workers
-import htmlBuilder
+from workers import getFuelData,filterData
+from htmlBuilder import header,fuelTable,footer
 from pprint import pprint
 from flask import Flask
 
@@ -17,18 +17,18 @@ app = Flask(__name__)
 
 @app.route('/')
 def buildPage():
+    scrapedData = getFuelData()
 
-    scrapedData = list()
-    scrapedData = workers.getFuelData()
-    requiredData = workers.filterData(scrapedData, parameters={'Count':3})
-
-    page = f'''
-    {htmlBuilder.header()}
-    <div>Fuel type: {workers.FuelTypes[requiredData[0]["fuelType"]]}</div>
-    {htmlBuilder.buildTable(["Price","Name","Address","Location"],requiredData)}
-    {htmlBuilder.footer()}
+    return f'''
+        {header()}
+            <div class="heading">FuelWatch</div>
+            {fuelTable(filterData(scrapedData, parameters={'Count':3}))}
+            {fuelTable(filterData(scrapedData, parameters={'Count':3,'FuelType':'Premium Unleaded'}))}
+            {fuelTable(filterData(scrapedData, parameters={'Count':3,'FuelType':'98 RON'}))}
+            {fuelTable(filterData(scrapedData, parameters={'Count':3,'FuelType':'Diesel'}))}
+            {fuelTable(filterData(scrapedData, parameters={'Count':3,'FuelType':'LPG'}))}
+        {footer()}
     '''
-    return page
 
 if __name__ == '__main__':
   app.run(debug=True, host='0.0.0.0')

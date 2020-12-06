@@ -4,6 +4,7 @@ from pprint import pprint
 from geocoder import ip
 from datetime import datetime
 import collections
+import geopy.distance
 
 Days = ['yesterday', 'today', 'tomorrow']
 
@@ -16,6 +17,10 @@ FuelTypes = {
     10 : 'E85',
     11 : 'Brand diesel',
 }
+
+PerthLL = (-31.950527,115.860458)
+CanningtonLL = (-32.019870,115.933000)
+FremantleLL = (-32.056171,115.746941)
 
 FuelBrands = {
     '29' : '7-Eleven',
@@ -96,7 +101,7 @@ def getFuelData():
 
             #Get this day and fueltypes prices then sort by lowest price
             scrape = list()
-            scrape = getPrices(day=d,product_id=str(ft), suburb="Perth")
+            scrape = getPrices(day=d,product_id=str(ft))
             s=sorted(scrape['items'], key=lambda item : item['price'], reverse=False)
 
             #Build new list of service station dictionaries containing just the required data
@@ -130,10 +135,7 @@ def tomorrowReleased():
     now = datetime.now().time()
     afterToothHurty = now.replace(hour=14, minute=30, second=0, microsecond=0)
 
-    if(now > afterToothHurty):
-        return True
-    else:
-        return False
+    return now > afterToothHurty
 
 def userLocation():
      return ip('me')
@@ -194,3 +196,9 @@ def filterData(data, parameters={}):
 
     filterData = data[dayIndex][ftIndex]['stations'][0:count]
     return filterData
+
+def nearByServo(me, distance, data):
+    return [
+        servo
+        for servo in data if geopy.distance.distance(me,(servo['latitude'],servo['longitude'])).km < distance
+    ]

@@ -108,14 +108,12 @@ def filterTest():
     #print(strFT)
     #print(workers.buildTable(["Price","Name","Address","Location"],requiredData))
 
-def runTest():
-    app.run(debug=True, host='0.0.0.0')
+if __name__ == '__main__':
+    #app.run(debug=True, host='0.0.0.0')
 
     #pprint(getPrices())
     #pprint(userLocation().city)
     #buildTableTest()    
-
-    filterTest()
-
-
-runTest()
+    #filterTest()
+    
+    pprint(workers.nearByServo(workers.FremantleLL,5,workers.filterData(workers.getFuelData())))

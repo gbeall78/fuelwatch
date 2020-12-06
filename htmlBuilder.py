@@ -1,11 +1,10 @@
 import exceptions
 from validate import validateHTMLStyleAttribute,validateHTMLClassAttribute
+from flask import url_for
+from workers import FuelTypes
 
 def tabs(number):
-    tabs = str()
-    for n in range(number):
-        tabs += '\t'
-    return tabs
+    return '\t' * number
 
 def header():
     header = f'''
@@ -13,6 +12,8 @@ def header():
         <html>
         <head>
             <title>Fuel Watch</title>
+
+            <link rel="stylesheet" href="{url_for('static',filename='styles/fuelwatch_default.css')}">
         </head>
         <body>
     '''
@@ -61,8 +62,14 @@ def buildTable(header, data, style='', className=''):
             
         table += f'{tabs(4)}<tr>\n' 
         for h in header:
-            table += f'{tabs(5)}<th>{h}</th>\n'
+            table += f'{tabs(5)}<th class="{h}">{h}</th>\n'
         table += f'{tabs(4)}</tr>\n'
         table += buildTableRow(data)
         table += f'{tabs(3)}</table>\n'
         return table
+
+def fuelTable(data):
+    return f'''
+    <div class="fueltype_header">Fuel type: {FuelTypes[data[0]["fuelType"]]}</div>
+    {buildTable(["Price","Name","Address","Location"],data)}
+    '''
