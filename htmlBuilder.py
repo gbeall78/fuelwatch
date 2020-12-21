@@ -1,30 +1,11 @@
 import exceptions
 from validate import validateHTMLStyleAttribute,validateHTMLClassAttribute
-from flask import url_for
+from flask import url_for,request
 from workers import FuelTypes
+import json
 
 def tabs(number):
     return '\t' * number
-
-def header():
-    header = f'''
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Fuel Watch</title>
-
-            <link rel="stylesheet" href="{url_for('static',filename='styles/fuelwatch_default.css')}">
-        </head>
-        <body>
-    '''
-    return header
-
-def footer():
-    footer = f'''
-        </body>
-    </html>    
-    '''
-    return footer
 
 def buildTableRow(data):
     rows = str()

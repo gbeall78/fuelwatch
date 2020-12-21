@@ -22,6 +22,11 @@ PerthLL = (-31.950527,115.860458)
 CanningtonLL = (-32.019870,115.933000)
 FremantleLL = (-32.056171,115.746941)
 
+userData = {
+    'lng':  '',
+    'lat': ''
+}
+
 FuelBrands = {
     '29' : '7-Eleven',
     '2' : 'Ampol',

@@ -1,8 +1,8 @@
 import feedparser
-from workers import getFuelData,filterData
-from htmlBuilder import header,fuelTable,footer
+from workers import getFuelData,filterData,userData
+from htmlBuilder import fuelTable
 from pprint import pprint
-from flask import Flask
+from flask import Flask, request, render_template, jsonify, Markup,redirect,url_for
 
 '''
     Show opening page
@@ -13,22 +13,33 @@ from flask import Flask
     Reload page with data
 '''
 
+
+
 app = Flask(__name__)
+
+@app.route('/get_location')
+def getUserLocation():
+    userData['lng'] = request.args.get('lng')
+    userData['lat'] = request.args.get('lat')
+    return redirect(url_for('/'))
+
 
 @app.route('/')
 def buildPage():
     scrapedData = getFuelData()
 
-    return f'''
-        {header()}
-            <div class="heading">FuelWatch</div>
-            {fuelTable(filterData(scrapedData, parameters={'Count':3}))}
-            {fuelTable(filterData(scrapedData, parameters={'Count':3,'FuelType':'Premium Unleaded'}))}
-            {fuelTable(filterData(scrapedData, parameters={'Count':3,'FuelType':'98 RON'}))}
-            {fuelTable(filterData(scrapedData, parameters={'Count':3,'FuelType':'Diesel'}))}
-            {fuelTable(filterData(scrapedData, parameters={'Count':3,'FuelType':'LPG'}))}
-        {footer()}
-    '''
+    if userData['lng'] != '':
+        print(userData['lng'])
+    else:
+        print('Gathering data')
+
+    return render_template('index.html',
+    ULP = Markup(fuelTable(filterData(scrapedData, parameters={'Count':3}))),
+    PULP = Markup(fuelTable(filterData(scrapedData, parameters={'Count':3,'FuelType':'Premium Unleaded'}))),
+    RON98 = Markup(fuelTable(filterData(scrapedData, parameters={'Count':3,'FuelType':'98 RON'}))),
+    Diesel = Markup(fuelTable(filterData(scrapedData, parameters={'Count':3,'FuelType':'Diesel'}))),
+    LPG = Markup(fuelTable(filterData(scrapedData, parameters={'Count':3,'FuelType':'LPG'})))
+    )
 
 if __name__ == '__main__':
   app.run(debug=True, host='0.0.0.0')

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fuel Watch</title>
+
+    <link rel="stylesheet" href="{{ url_for('static',filename='styles/fuelwatch_default.css') }}">
+
+    <script type=text/javascript>
+        $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+    </script>
+    <script type=text/javascript src="{{ url_for('static',filename='scripts/jquery-3.5.1.min.js') }}"></script>
+    <script type=text/javascript src="{{ url_for('static',filename='scripts/location.js') }}"></script>
+</head>
+<body onload="getLocation()" >
+    <div class="heading">FuelWatch</div>
+    {{ ULP }}
+    {{ PULP }}
+    {{ RON98 }}
+    {{ Diesel }}
+    {{ LPG }}
+</body>
+</html>
