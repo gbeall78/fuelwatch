@@ -1,0 +1,44 @@
+body {
+  background-color: rgb(245, 251, 212);
+}
+
+h1 {
+  color: navy;
+  margin-left: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+table, th, td {
+    border: 1px solid black;
+}
+
+td {
+  padding: 2px
+}
+
+.heading {
+  font-size: 60px;
+  text-align: center;
+}
+
+.fueltype_header {
+  font-size: 30px;
+  padding-bottom: 10px;
+}
+
+th.Price {
+  width: 10ch;
+}
+
+th.Name {
+  width: 20%;
+}
+
+th.Location {
+  width: 20%;
+}
