@@ -1,5 +1,5 @@
 import feedparser
-from workers import getFuelData,filterData,userData
+from workers import getFuelData,filterData,userData,readCache,writeCache
 from htmlBuilder import fuelTable
 from pprint import pprint
 from flask import Flask, request, render_template, jsonify, Markup,redirect,url_for
@@ -13,20 +13,21 @@ from flask import Flask, request, render_template, jsonify, Markup,redirect,url_
     Reload page with data
 '''
 
-
-
 app = Flask(__name__)
 
 @app.route('/get_location')
 def getUserLocation():
     userData['lng'] = request.args.get('lng')
     userData['lat'] = request.args.get('lat')
-    return redirect(url_for('/'))
+    return redirect(url_for('buildPage'))
 
 
 @app.route('/')
 def buildPage():
-    scrapedData = getFuelData()
+    scrapedData = readCache()
+    if(scrapedData == ''):
+        scrapedData = getFuelData()
+        writeCache(scrapedData)
 
     if userData['lng'] != '':
         print(userData['lng'])

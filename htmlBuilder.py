@@ -26,9 +26,9 @@ def buildTable(header, data, style='', className=''):
         if className != '':    
             validateHTMLClassAttribute(className)
     except exceptions.invalidStyleParameter as err:
-        pprint(err)
+        print(err)
     except exceptions.invalidClassParameter as err:
-        pprint(err)
+        print(err)
     else:
         table = str()
         table += f'{tabs(3)}<table'

@@ -5,6 +5,8 @@ from geocoder import ip
 from datetime import datetime
 import collections
 import geopy.distance
+import os.path
+import json
 
 Days = ['yesterday', 'today', 'tomorrow']
 
@@ -203,7 +205,19 @@ def filterData(data, parameters={}):
     return filterData
 
 def nearByServo(me, distance, data):
+    
     return [
         servo
         for servo in data if geopy.distance.distance(me,(servo['latitude'],servo['longitude'])).km < distance
     ]
+
+def writeCache(data):
+    with open("fuelData.json", "w") as fuelFile:
+        json.dump(data, fuelFile)
+
+def readCache():
+    if(os.path.isfile("fuelData.json")):
+        with open("fuelData.json", "r") as fuelFile:
+            return json.load(fuelFile)
+    else:
+        return ''
