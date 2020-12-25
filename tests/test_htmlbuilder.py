@@ -1,6 +1,5 @@
 from exceptions import invalidStyleParameter,invalidClassParameter,noTableHeaderException,tableHeaderDataSizeMismatchException
 from pprint import pprint
-import workers
 from htmlBuilder import buildTable
 from flask import Flask
 import pytest
@@ -54,19 +53,7 @@ def test_buildTable():
     with pytest.raises(tableHeaderDataSizeMismatchException):
         buildTable(testDataHeader+testDataHeader, testDataServo)
 
-def getFuelDataTest():
-    fuelData = list()
-    fuelData = workers.getFuelData()
-
-    daysCollected = len(fuelData)
-    if(daysCollected == 3):
-        pprint("Yesterdays, todays and tomorrows data has been collected.")
-    elif(daysCollected == 2 and not workers.tomorrowReleased()):
-        pprint("Before 2:30PM. Yesterdays and todays data have been collected.")
-    else:
-        return None
-
-    return fuelData
+a
 
 @app.route('/')
 def filterTest():
