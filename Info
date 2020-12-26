@@ -1,7 +1,26 @@
 https://www.fuelwatch.wa.gov.au/fuelwatch/pages/public/contentholder.jspx?key=fuelwatchRSS.html
 
+Yesterdays is only useful for statistics e.g SQL
+How to store cache: Currently single file
 
+initCheck #More flexible for SQL refactoring i.e. separate data dumps
+    if TodayCache != exist
+        setSchedule:
+            getDataTomorrow @ 1430
+        write today
+    if TomorrowCache != exist && after 1430 
+        write tomorrow
 
-pytest
+initCheck #Least changes required currently. Single data dump
+    if TodayCache != exist
+        setSchedule:
+            getDataTomorrow @ 1430 
+    write Data
 
-
+readCache
+    getData
+    if getData== 2 #tomorrow not gotted
+        Show day (1)
+    if getData == 3
+        show day (1)
+        show day (2)

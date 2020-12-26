@@ -1,10 +1,6 @@
 from exceptions import invalidStyleParameter,invalidClassParameter,noTableHeaderException,tableHeaderDataSizeMismatchException
-from pprint import pprint
-from htmlBuilder import buildTable
-from flask import Flask
 import pytest
-
-app = Flask(__name__)
+from htmlBuilder import buildTable
 
 def test_buildTable():
     testDataHeader = ["Price", "Trading Name", "Address", "Location"]
@@ -52,36 +48,3 @@ def test_buildTable():
     #Too many items
     with pytest.raises(tableHeaderDataSizeMismatchException):
         buildTable(testDataHeader+testDataHeader, testDataServo)
-
-a
-
-@app.route('/')
-def filterTest():
-
-    fuelData = getFuelDataTest()
-    if(fuelData == None):
-        pprint("Invalid fuel data list")
-        exit()
-
-    #requiredData = workers.filterData(fuelData)
-    #requiredData = workers.filterData(fuelData, parameters={'Count':600})
-    #requiredData = workers.filterData(fuelData, parameters={'Day':'Today'})
-    #requiredData = workers.filterData(fuelData, parameters={'Day':'yesterday'})
-    #requiredData = workers.filterData(fuelData, parameters={'FuelType':'Electric'})
-    #requiredData = workers.filterData(fuelData, parameters={'Suburb':'Perth'})
-    requiredData = workers.filterData(fuelData, parameters={'FuelType':'Diesel','Day':'yesterday'})
-    
-    strFT = f'Fuel type: {workers.FuelTypes[requiredData[0]["fuelType"]]}\n{buildTable(["Price","Name","Address","Location"],requiredData)}'
-    return strFT
-    #print(strFT)
-    #print(workers.buildTable(["Price","Name","Address","Location"],requiredData))
-
-if __name__ == '__main__':
-    #app.run(debug=True, host='0.0.0.0')
-
-    #pprint(getPrices())
-    #pprint(userLocation().city)
-    #buildTableTest()    
-    #filterTest()
-    
-    pprint(workers.nearByServo(workers.FremantleLL,5,workers.filterData(workers.getFuelData())))
