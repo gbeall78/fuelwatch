@@ -1,7 +1,7 @@
 import exceptions
 from validate import validateHTMLStyleAttribute,validateHTMLClassAttribute
 from flask import url_for,request
-from workers import FuelTypes
+from fuelData import FuelTypes
 import json
 
 def tabs(number):
