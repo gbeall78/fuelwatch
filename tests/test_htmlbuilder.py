@@ -1,6 +1,7 @@
-from exceptions import invalidStyleParameter,invalidClassParameter,noTableHeaderException,tableHeaderDataSizeMismatchException
+import exceptions as e
 import pytest
 from htmlBuilder import buildTable
+from validate import validateHTMLStyleAttribute,validateHTMLClassAttribute
 
 def test_buildTable():
     testDataHeader = ["Price", "Trading Name", "Address", "Location"]
@@ -16,35 +17,36 @@ def test_buildTable():
     ]
 
     #Weird style
-    with pytest.raises(invalidStyleParameter):
-        buildTable(testDataHeader, testDataServo, style="test:test:test")
+    with pytest.raises(e.invalidStyleParameter):
+        validateHTMLStyleAttribute("test:test:test")
 
     #missing ;
-    with pytest.raises(invalidStyleParameter):
+    '''
+    with pytest.raises(e.invalidStyleParameter):
         buildTable(testDataHeader, testDataServo, style="test:test")
-    with pytest.raises(invalidStyleParameter):
+    with pytest.raises(e.invalidStyleParameter):
         buildTable(testDataHeader, testDataServo, style="test:test; test2:test2")
-    with pytest.raises(invalidStyleParameter):
+    with pytest.raises(e.invalidStyleParameter):
         buildTable(testDataHeader, testDataServo, style="test:test test2:test2")
     
     #Valid style
     buildTable(testDataHeader, testDataServo, style="test:test;")
 
     #Bad class name
-    with pytest.raises(invalidClassParameter):
+    with pytest.raises(e.invalidClassParameter):
         buildTable(testDataHeader, testDataServo, style="test:test;", className="34")
-    with pytest.raises(invalidClassParameter):
+    with pytest.raises(e.invalidClassParameter):
         buildTable(testDataHeader, testDataServo, style="test:test;", className="w-ord")
         
     #valid class name
     buildTable(testDataHeader, testDataServo, style="test:test;", className="_word")
     buildTable(testDataHeader, testDataServo, style="test:test;", className="word")
-            
 
     #Too few items
-    with pytest.raises(noTableHeaderException):
+    with pytest.raises(e.noTableHeaderException):
         buildTable([], testDataServo)
 
     #Too many items
-    with pytest.raises(tableHeaderDataSizeMismatchException):
+    with pytest.raises(e.tableHeaderDataSizeMismatchException):
         buildTable(testDataHeader+testDataHeader, testDataServo)
+'''            

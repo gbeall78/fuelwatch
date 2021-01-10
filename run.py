@@ -2,7 +2,6 @@ import feedparser
 from fuelData import FuelData
 from workers import userData
 from htmlBuilder import fuelTable
-from pprint import pprint
 from flask import Flask, request, render_template, jsonify, Markup,redirect,url_for
 import time
 import threading

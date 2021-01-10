@@ -1,35 +1,16 @@
 import pytest
-from workers import filterData,getFuelData,tomorrowReleased
-from flask import Flask
-
-app = Flask(__name__)
-
-def test_getFuelData():
-    daysCollected = len(getFuelData())
-
-    #If nothing returned fail
-    assert daysCollected != None
-
-    #Check if the relevant number of days is collected
-    assert daysCollected == 3, "Yesterdays, todays and tomorrows data has been collected."
-    assert daysCollected == 2 and not tomorrowReleased(), "Before 2:30PM. Yesterdays and todays data have been collected."
+from fuelData import FuelData
 
 def test_filterData():
-    fuelData = getFuelData()
+    with pytest.raises(AttributeError):
+        today = FuelData()
 
-    #requiredData = filterData(fuelData)
+    today = FuelData('today')
     
     #Test too many stations requested
-    count = len(fuelData[1][0]['stations']) 
-    assert len(filterData(fuelData, parameters={'Count':600})[1][0]['stations']) == count
-
-    #Test invalid day given (Case sensitive test)
-    with pytest.raises(ValueError):
-        requiredData = filterData(fuelData, parameters={'Day':'Today'})
+    count = len(today.data[0]['stations']) 
+    assert len(today.filterData(parameters={'Count':600})) == count
 
     #Invalid Fueltype test
-    with pytest.raises(KeyError):
-        filterData(fuelData, parameters={'FuelType':'Electric'})
-
-    #requiredData = filterData(fuelData, parameters={'Suburb':'Perth'})
-    #requiredData = filterData(fuelData, parameters={'FuelType':'Diesel','Day':'yesterday'})
+    with pytest.raises(KeyError, match=r"^Invalid fuel type given. Valid options are:.*$"):
+        today.filterData(parameters={'FuelType':'Electric'})

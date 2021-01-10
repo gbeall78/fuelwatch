@@ -1,7 +1,7 @@
 import exceptions as e
+import sys
 from feedparser import parse
 import collections
-from pprint import pprint
 import json
 from pathlib import Path
 from datetime import datetime,timedelta
@@ -46,6 +46,7 @@ FuelBrands = {
     '16' : 'Wesco',
 }
 
+
 class FuelData:
 
     def __init__(self, day=None):
@@ -69,10 +70,12 @@ class FuelData:
         self.renew()
 
     def __del__(self):
-        self.removeCache()
+        if(self.cacheFile.exists()):
+            self.cacheFile.unlink()
         self.data = []
     
     def renew(self):
+        #If writing returns false the data exists so just read it from file
         if(not self.writeCache()):
             self.data = self.readCache()
 
@@ -160,10 +163,10 @@ class FuelData:
                         ftIndex = i
 
         except KeyError as err:
-            pprint('Invalid fuel type given. Valid options are:')
+            print('Invalid fuel type given. Valid options are:')
             for i in FuelTypes: 
-                pprint(FuelTypes[i])
-            exit()
+                print(FuelTypes[i])
+            raise
         
         #Check if the requested number of items doesn't exceed the number items that exist.
         #Set count to the lowest option.
@@ -196,7 +199,7 @@ class FuelData:
             Current data will cause the write to not happen.
 
             Tomorrows data should also only exist if it's between 1430 and 0000 the next day
-            Therefore remove it if it exists outside of that time frame and exit.
+            Therefore remove it if it exists outside of that timeframe and exit.
         '''
 
         if(self.cacheFile.exists()):
@@ -219,7 +222,7 @@ class FuelData:
                     return False
                 else: #Tomorrow hasn't been released so the file should be removed
                     self.cacheFile.unlink()
-                    return True
+                    return True #Return success so an attempt isn't made to read cache
         #No file exists for Tomorrow but it hasn't been released so exit.
         elif(self.day == 'tomorrow' and not self.tomorrowReleased()):
             return True
