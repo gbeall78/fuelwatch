@@ -46,7 +46,6 @@ FuelBrands = {
     '16' : 'Wesco',
 }
 
-
 class FuelData:
 
     def __init__(self, day=None):
