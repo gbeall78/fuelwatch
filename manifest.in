@@ -1,0 +1,6 @@
+graft FuelWatch/static
+graft FuelWatch/templates
+graft FuelWatch/tests
+global-exclude *.pyc
+global-exclude *.vscode
+global-exclude data/*
