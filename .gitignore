@@ -151,3 +151,5 @@ dmypy.json
 info
 *.swp
 .DS_Store
+/db/*
+

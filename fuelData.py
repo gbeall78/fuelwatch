@@ -5,6 +5,7 @@ import collections
 import json
 from pathlib import Path
 from datetime import datetime,timedelta
+import geopy.distance
 
 Days = ['yesterday', 'today', 'tomorrow']
 
@@ -238,3 +239,9 @@ class FuelData:
             with open(self.dataStore['Location'], "r") as fuelFile:
                 return json.load(fuelFile)
         return []
+
+    def nearByServo(self, data, userLocation, distance):
+        return [
+            servo
+            for servo in data if geopy.distance.distance(userLocation,(servo['latitude'],servo['longitude'])).km < distance
+        ]

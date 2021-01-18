@@ -1,11 +1,12 @@
 import feedparser
+from userData import UserData
 from fuelData import FuelData
-from workers import userData
 from htmlBuilder import fuelTable
 from flask import Flask, request, render_template, jsonify, Markup,redirect,url_for
 import time
 import threading
 import schedule
+import sqlite3
 
 '''
     Show opening page
@@ -21,28 +22,56 @@ app = Flask(__name__)
 yesterday = FuelData('yesterday')
 today = FuelData('today')
 tomorrow = FuelData('tomorrow')
+user = UserData()
 
 @app.route('/get_location')
 def getUserLocation():
-    userData['lng'] = request.args.get('lng')
-    userData['lat'] = request.args.get('lat')
+    user.location['latitude'] = request.args.get('lat')
+    user.location['longitude'] = request.args.get('lng')
     return redirect(url_for('buildPage'))
 
 @app.route('/')
 @app.route('/index')
 def buildPage():
 
-    if userData['lng'] != '':
-        print(userData['lng'])
-    else:
-        print('Gathering data')
-
-    return render_template('index.html',
+    '''
         ULP = Markup(fuelTable(today.filterData(parameters={'Count':3}))),
         PULP = Markup(fuelTable(today.filterData(parameters={'Count':3,'FuelType':'Premium Unleaded'}))),
         RON98 = Markup(fuelTable(today.filterData(parameters={'Count':3,'FuelType':'98 RON'}))),
         Diesel = Markup(fuelTable(today.filterData(parameters={'Count':3,'FuelType':'Diesel'}))),
         LPG = Markup(fuelTable(today.filterData(parameters={'Count':3,'FuelType':'LPG'})))
+    '''
+    return render_template('index.html',
+        ULP = Markup(
+            fuelTable(
+                today.nearByServo(today.filterData(),(user.location['latitude'],user.location['longitude']),5)[0:3]
+            )
+        ),
+        PULP = Markup(
+            fuelTable(
+                today.nearByServo(today.filterData(parameters={'FuelType':'Premium Unleaded'}),(user.location['latitude'],user.location['longitude']),5)[0:3]
+            )
+        ),
+        RON98 = Markup(
+            fuelTable(
+                today.nearByServo(today.filterData(parameters={'FuelType':'98 RON'}),(user.location['latitude'],user.location['longitude']),5)[0:3]
+            )
+        ),
+        Diesel = Markup(
+            fuelTable(
+                today.nearByServo(today.filterData(parameters={'FuelType':'Diesel'}),(user.location['latitude'],user.location['longitude']),5)[0:3]
+            )
+        ),
+        LPG = Markup(
+            fuelTable(
+                today.nearByServo(today.filterData(parameters={'FuelType':'LPG'}),(user.location['latitude'],user.location['longitude']),5)[0:3]
+            )
+        ),
+        TMRW_ULP = None if tomorrow.data == [] else Markup(fuelTable(tomorrow.filterData(parameters={'Count':3}))),
+        TMRW_PULP = None if tomorrow.data == [] else  Markup(fuelTable(tomorrow.filterData(parameters={'Count':3,'FuelType':'Premium Unleaded'}))),
+        TMRW_RON98 = None if tomorrow.data == [] else  Markup(fuelTable(tomorrow.filterData(parameters={'Count':3,'FuelType':'98 RON'}))),
+        TMRW_Diesel = None if tomorrow.data == [] else  Markup(fuelTable(tomorrow.filterData(parameters={'Count':3,'FuelType':'Diesel'}))),
+        TMRW_LPG = None if tomorrow.data == [] else  Markup(fuelTable(tomorrow.filterData(parameters={'Count':3,'FuelType':'LPG'}))),
     )
 
 def run_continuously(interval=1):
