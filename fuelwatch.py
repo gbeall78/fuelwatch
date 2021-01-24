@@ -6,7 +6,6 @@ from flask import Flask, request, render_template, jsonify, Markup,redirect,url_
 import time
 import threading
 import schedule
-import sqlite3
 
 '''
     Show opening page
@@ -34,13 +33,6 @@ def getUserLocation():
 @app.route('/index')
 def buildPage():
 
-    '''
-        ULP = Markup(fuelTable(today.filterData(parameters={'Count':3}))),
-        PULP = Markup(fuelTable(today.filterData(parameters={'Count':3,'FuelType':'Premium Unleaded'}))),
-        RON98 = Markup(fuelTable(today.filterData(parameters={'Count':3,'FuelType':'98 RON'}))),
-        Diesel = Markup(fuelTable(today.filterData(parameters={'Count':3,'FuelType':'Diesel'}))),
-        LPG = Markup(fuelTable(today.filterData(parameters={'Count':3,'FuelType':'LPG'})))
-    '''
     return render_template('index.html',
         ULP = Markup(
             fuelTable(
