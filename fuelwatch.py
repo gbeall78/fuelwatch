@@ -25,8 +25,8 @@ user = UserData()
 
 @app.route('/get_location')
 def getUserLocation():
-    user.location['latitude'] = request.args.get('lat')
-    user.location['longitude'] = request.args.get('lng')
+    user.latlng = [request.args.get('lat'), request.args.get('lng')]
+    print(user.latlng)
     return redirect(url_for('buildPage'))
 
 @app.route('/')
@@ -34,29 +34,30 @@ def getUserLocation():
 def buildPage():
 
     return render_template('index.html',
+        UserLocation = user.location.raw['address']['suburb'],
         ULP = Markup(
             fuelTable(
-                today.nearByServo(today.filterData(),(user.location['latitude'],user.location['longitude']),5)[0:3]
+                today.nearByServo(today.filterData(),user.latlng,5)[0:3]
             )
         ),
         PULP = Markup(
             fuelTable(
-                today.nearByServo(today.filterData(parameters={'FuelType':'Premium Unleaded'}),(user.location['latitude'],user.location['longitude']),5)[0:3]
+                today.nearByServo(today.filterData(parameters={'FuelType':'Premium Unleaded'}),user.latlng,5)[0:3]
             )
         ),
         RON98 = Markup(
             fuelTable(
-                today.nearByServo(today.filterData(parameters={'FuelType':'98 RON'}),(user.location['latitude'],user.location['longitude']),5)[0:3]
+                today.nearByServo(today.filterData(parameters={'FuelType':'98 RON'}),user.latlng,5)[0:3]
             )
         ),
         Diesel = Markup(
             fuelTable(
-                today.nearByServo(today.filterData(parameters={'FuelType':'Diesel'}),(user.location['latitude'],user.location['longitude']),5)[0:3]
+                today.nearByServo(today.filterData(parameters={'FuelType':'Diesel'}),user.latlng,5)[0:3]
             )
         ),
         LPG = Markup(
             fuelTable(
-                today.nearByServo(today.filterData(parameters={'FuelType':'LPG'}),(user.location['latitude'],user.location['longitude']),5)[0:3]
+                today.nearByServo(today.filterData(parameters={'FuelType':'LPG'}),user.latlng,5)[0:3]
             )
         ),
         TMRW_ULP = None if tomorrow.data == [] else Markup(fuelTable(tomorrow.filterData(parameters={'Count':3}))),
