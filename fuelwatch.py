@@ -26,6 +26,7 @@ user = UserData()
 @app.route('/get_location')
 def getUserLocation():
     user.latlng = [request.args.get('lat'), request.args.get('lng')]
+    user.updateLocation()
     print(user.latlng)
     return redirect(url_for('buildPage'))
 
