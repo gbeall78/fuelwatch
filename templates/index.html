@@ -8,12 +8,20 @@
         <button class="tablinks" onclick="openPage(event, 'tomorrow')">Tomorrows prices</button>
     </div>
     <div id="today" class="tabcontent">
-        <h3>Fuel prices within a 5km radius of {{ UserLocation }}</h3>
-        {{ ULP }}
-        {{ PULP }}
-        {{ RON98 }}
-        {{ Diesel }}
-        {{ LPG }}
+        <form >
+            <h3>Fuel prices within a 
+                <select name="radius" onchange="this.form.submit()">
+                    {% for r in radiusChoices %}
+                        <option value="{{ r }}" {% if r == radius %}selected{% endif %}>{{ r }}</option>
+                    {% endfor %}
+                </select> 
+            radius of {{ UserLocation }}</h3>
+            {{ ULP }}
+            {{ PULP }}
+            {{ RON98 }}
+            {{ Diesel }}
+            {{ LPG }}
+        </form>
     </div>
     <div id="tomorrow" class="tabcontent">
         {% if TMRW_ULP %}

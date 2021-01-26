@@ -7,15 +7,6 @@ import time
 import threading
 import schedule
 
-'''
-    Show opening page
-    Collect data. 
-        ?Could this be done twice per day and stored locally for faster lookup?
-        Better yet, retrieve once, after 2:30pm but use the data for tomorrow as well.
-    Show progress e.g. retrieving data, acquiring location, locating closest options
-    Reload page with data
-'''
-
 app = Flask(__name__)
 
 yesterday = FuelData('yesterday')
@@ -27,45 +18,72 @@ user = UserData()
 def getUserLocation():
     user.latlng = [request.args.get('lat'), request.args.get('lng')]
     user.updateLocation()
-    print(user.latlng)
     return redirect(url_for('buildPage'))
 
 @app.route('/')
 @app.route('/index')
 def buildPage():
 
+    radiusChoices = [2,3,5,10,15]
+    radius = 5
+
+    if('radius' in request.args):
+        radius = int(request.args['radius'])
+
     return render_template('index.html',
+        radiusChoices = radiusChoices,
+        radius = radius,
         UserLocation = user.location.raw['address']['suburb'],
         ULP = Markup(
             fuelTable(
-                today.nearByServo(today.filterData(),user.latlng,5)[0:3]
+                today.nearByServo(today.filterData(),user.latlng,radius)[0:3]
             )
         ),
         PULP = Markup(
             fuelTable(
-                today.nearByServo(today.filterData(parameters={'FuelType':'Premium Unleaded'}),user.latlng,5)[0:3]
+                today.nearByServo(today.filterData(parameters={'FuelType':'Premium Unleaded'}),user.latlng,radius)[0:3]
             )
         ),
         RON98 = Markup(
             fuelTable(
-                today.nearByServo(today.filterData(parameters={'FuelType':'98 RON'}),user.latlng,5)[0:3]
+                today.nearByServo(today.filterData(parameters={'FuelType':'98 RON'}),user.latlng,radius)[0:3]
             )
         ),
         Diesel = Markup(
             fuelTable(
-                today.nearByServo(today.filterData(parameters={'FuelType':'Diesel'}),user.latlng,5)[0:3]
+                today.nearByServo(today.filterData(parameters={'FuelType':'Diesel'}),user.latlng,radius)[0:3]
             )
         ),
         LPG = Markup(
             fuelTable(
-                today.nearByServo(today.filterData(parameters={'FuelType':'LPG'}),user.latlng,5)[0:3]
+                today.nearByServo(today.filterData(parameters={'FuelType':'LPG'}),user.latlng,radius)[0:3]
             )
         ),
-        TMRW_ULP = None if tomorrow.data == [] else Markup(fuelTable(tomorrow.filterData(parameters={'Count':3}))),
-        TMRW_PULP = None if tomorrow.data == [] else  Markup(fuelTable(tomorrow.filterData(parameters={'Count':3,'FuelType':'Premium Unleaded'}))),
-        TMRW_RON98 = None if tomorrow.data == [] else  Markup(fuelTable(tomorrow.filterData(parameters={'Count':3,'FuelType':'98 RON'}))),
-        TMRW_Diesel = None if tomorrow.data == [] else  Markup(fuelTable(tomorrow.filterData(parameters={'Count':3,'FuelType':'Diesel'}))),
-        TMRW_LPG = None if tomorrow.data == [] else  Markup(fuelTable(tomorrow.filterData(parameters={'Count':3,'FuelType':'LPG'}))),
+        TMRW_ULP = None if tomorrow.data == [] else Markup(
+            fuelTable(
+                tomorrow.filterData()
+            )
+        ),
+        TMRW_PULP = None if tomorrow.data == [] else  Markup(
+            fuelTable(
+                tomorrow.filterData(parameters={'FuelType':'Premium Unleaded'})[0:3]
+            )
+        ),
+        TMRW_RON98 = None if tomorrow.data == [] else  Markup(
+            fuelTable(
+                tomorrow.filterData(parameters={'FuelType':'98 RON'})[0:3]
+            )
+        ),
+        TMRW_Diesel = None if tomorrow.data == [] else  Markup(
+            fuelTable(
+                tomorrow.filterData(parameters={'FuelType':'Diesel'})[0:3]
+            )
+        ),
+        TMRW_LPG = None if tomorrow.data == [] else  Markup(
+            fuelTable(
+                tomorrow.filterData(parameters={'FuelType':'LPG'})[0:3]
+            )
+        ),
     )
 
 def run_continuously(interval=1):
