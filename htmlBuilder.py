@@ -1,15 +1,11 @@
-from fuelData import FuelType
+from fuelData import FuelTypes
 from airium import Airium
 
 def fuelTable(data):
     html = Airium()
 
     with html.table():
-        print(data[0])
-        print(data[0]["fuelType"])
-        print(FuelTypes[data[0]["fuelType"]])
         ft = "Fuel type: " + FuelTypes[data[0]["fuelType"]]
-        print(ft)
         with html.div(klass='fueltype_header', _t=ft):
             with html.tr():
                 html.th(klass='Price', _t='Price')
