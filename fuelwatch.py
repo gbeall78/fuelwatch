@@ -13,6 +13,7 @@ yesterday = FuelData('yesterday')
 today = FuelData('today')
 tomorrow = FuelData('tomorrow')
 user = UserData()
+init()
 
 @app.route('/get_location')
 def getUserLocation():
@@ -117,8 +118,7 @@ def renewData():
     today.renew()
     tomorrow.renew()
 
-if __name__ == '__main__':
-    
+def init():
     '''
         Initialise data then set scheduler.
         Scheduler doesn't run missed jobs
@@ -128,5 +128,8 @@ if __name__ == '__main__':
     schedule.every().day.at("14:31").do(renewData)
     
     stop_run_continuously = run_continuously()
+
+if __name__ == '__main__':
+    
 
     app.run(debug=True, host='0.0.0.0')
