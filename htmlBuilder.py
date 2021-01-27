@@ -1,3 +1,4 @@
+from fuelData import FuelType
 from airium import Airium
 
 def fuelTable(data):

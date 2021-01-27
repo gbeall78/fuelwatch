@@ -22,6 +22,8 @@ setup(
         'pytest',
         'geopy',
         'geocoder',
-        'schedule'
+        'schedule',
+        'dataclasses,'
+        'airium'
     ],
 )
