@@ -13,7 +13,6 @@ yesterday = FuelData('yesterday')
 today = FuelData('today')
 tomorrow = FuelData('tomorrow')
 user = UserData()
-init()
 
 @app.route('/get_location')
 def getUserLocation():
@@ -130,6 +129,7 @@ def init():
     stop_run_continuously = run_continuously()
 
 if __name__ == '__main__':
-    
-
+    init()
     app.run(debug=True, host='0.0.0.0')
+else:
+    init()
