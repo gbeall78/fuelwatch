@@ -3,7 +3,13 @@
 <head>
     <title>Fuel Watch</title>
 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Caveat">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <link rel="stylesheet" href="{{ url_for('static',filename='styles/fuelwatch_default.css') }}">
+
+    <meta id="suburb-data" data-suburbs="{{ Suburbs }}">
 
     <script type=text/javascript>
         $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
@@ -11,6 +17,8 @@
     <script type=text/javascript src="{{ url_for('static',filename='scripts/jquery-3.5.1.min.js') }}"></script>
     <script type=text/javascript src="{{ url_for('static',filename='scripts/location.js') }}"></script>
     <script type=text/javascript src="{{ url_for('static',filename='scripts/tabs.js') }}"></script>
+    <script type=text/javascript src="{{ url_for('static',filename='scripts/autocomplete.js') }}"></script>
+
 </head>
 {% block body %}{% endblock %}
 </html>

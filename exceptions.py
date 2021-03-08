@@ -22,3 +22,6 @@ class tableHeaderDataSizeMismatchException(Exception):
 
 class cacheFailureException(Exception):
     pass
+
+class databaseTableException(Exception):
+    pass

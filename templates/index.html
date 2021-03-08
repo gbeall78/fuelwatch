@@ -2,37 +2,101 @@
    
 {% block body %}
 <body onload="getLocation()" >
-    <div class="heading">FuelWatch</div>
-    <div class="tab">
-        <button class="tablinks" id="defaultOpen" onclick="openPage(event, 'today')">Todays Prices</button>
-        <button class="tablinks" onclick="openPage(event, 'tomorrow')">Tomorrows prices</button>
+    <div class="heading"># fuelwatch</div>
+    <div class="tab w3-container w3-row-padding">
+        <button class="tablinks w3-third" {% if Search_result is none %} id="defaultOpen" {% endif %} onclick="openPage(event, 'today')">Todays Prices</button>
+        <button class="tablinks w3-third" onclick="openPage(event, 'tomorrow')">Tomorrows prices</button>
+        <button class="tablinks w3-third" {% if Search_result is not none %} id="defaultOpen" {% endif %} onclick="openPage(event, 'search')">Advanced search</button>
     </div>
-    <div id="today" class="tabcontent">
+    <div id="today" class="tabcontent w3-container w3-animate-opacity">
         <form >
             <h3>Fuel prices within a 
                 <select name="radius" onchange="this.form.submit()">
-                    {% for r in radiusChoices %}
-                        <option value="{{ r }}" {% if r == radius %}selected{% endif %}>{{ r }}</option>
+                    {% for r in RadiusChoices %}
+                        <option value="{{ r }}" {% if r == Radius %}selected{% endif %}>{{ r }}</option>
                     {% endfor %}
                 </select> 
             radius of {{ UserLocation }}</h3>
             {{ ULP }}
             {{ PULP }}
             {{ RON98 }}
-            {{ Diesel }}
+            {{ DIESEL }}
             {{ LPG }}
         </form>
     </div>
-    <div id="tomorrow" class="tabcontent">
+    <div id="tomorrow" class="tabcontent w3-container w3-animate-opacity">
         {% if TMRW_ULP %}
             {{ TMRW_ULP }}
             {{ TMRW_PULP }}
             {{ TMRW_RON98 }}
-            {{ TMRW_Diesel }}
+            {{ TMRW_DIESEL }}
             {{ TMRW_LPG }}
         {% else %}
             <h3>Tomorrows prices will be released afer 2:30pm WAST.</h3>
         {% endif %}
+    </div>
+    <div id="search" class="tabcontent w3-container w3-animate-opacity">
+        <form autocomplete="off" id="searchform" class="w3-container" action="/search" method="POST">
+            <p class="w3-margin-left"></p>
+            <div class="w3-display-container w3-row-padding">
+                <div class="search autocomplete w3-half w3-container w3-left">
+                    <input id="suburb" type="text" name="Suburb" placeholder="suburb">
+                </div>
+                <div class="search w3-half w3-container w3-right">
+                    <input type="checkbox" name="Surrounding" id="surrounding" value="1">
+                    <label for="surrounding">Surrounding suburbs</label>
+                </div>
+            </div>
+            <div class="w3-row-padding w3-display-container">
+                <div class="search w3-half w3-container w3-left">
+                    <select name="Product" id="fueltype" class="w3-select">
+                        <option value="" disabled selected>Fuel type</option>
+                        <option value="1">Unleaded</option>
+                        <option value="2">Premium</option>
+                        <option value="4">Diesel</option>
+                        <option value="5">LPG</option>
+                        <option value="6">98 RON</option>
+                        <option value="10">E85</option>
+                    </select>
+                </div>
+                <div class="search w3-half w3-container w3-right">
+                    <select name="Brand" id="brand" class="w3-select">
+                        <option value="" disabled selected>Fuel brand</option>
+                        {% for key,value in Brands.items() %}
+                        <option value="{{ key }}">{{ value }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="w3-row-padding w3-display-container">
+                <div class="search w3-half w3-container w3-left">
+                    <select name="Region" id="region" class="w3-select">
+                        <option value="" disabled selected>WA Region</option>
+                        {% for key,value in Regions.items() %}
+                        <option value="{{ key }}">{{ value }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="search w3-half w3-container w3-right">
+                    <select name="StateRegion" id="stateRegion" class="w3-select">
+                        <option value="" disabled selected>WA State region</option>
+                        {% for key,value in StateRegions.items() %}
+                        <option value="{{ key }}">{{ value }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class=" w3-btn w3-block w3-large w3-round-large w3-wide" form="searchform" value="Search">Search</button>
+            <script>
+                var suburbs = $('#suburb-data').data("suburbs");
+                autocomplete(document.getElementById("suburb"), suburbs);
+            </script>
+        </form>
+        <div>
+            {% if Search_result %}
+                {{ Search_result }}
+            {% endif %}
+        </div>
     </div>
     <script>
         // Get the element with id="defaultOpen" and click on it

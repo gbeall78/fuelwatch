@@ -1,248 +1,44 @@
-import exceptions as e
-import sys
 from feedparser import parse
-import collections
-import json
-from pathlib import Path
+from urllib.parse import quote_plus
 from datetime import datetime,timedelta
-import geopy.distance
-import sqlite3
 
-Days = ['yesterday', 'today', 'tomorrow']
+def getPrices(*args, **kwargs):
+    """Get fuel prices from FuelWatch.WA.gov.au
 
-FuelTypes = {
-    1 : 'Unleaded Petrol',
-    2 : 'Premium Unleaded',
-    4 : 'Diesel',
-    5 : 'LPG',
-    6 : '98 RON',
-    10 : 'E85',
-    11 : 'Brand diesel',
-}
-    
-FuelBrands = {
-    '29' : '7-Eleven',
-    '2' : 'Ampol',
-    '3' : 'Better Choice',
-    '4' : 'BOC',
-    '5' : 'BP',
-    '6' : 'Caltex',
-    '19' : 'Caltex Woolworths',
-    '20' : 'Coles Express',
-    '32' : 'Costco',
-    '24' : 'Eagle',
-    '25' : 'FastFuel 24/7',
-    '7' : 'Gull',
-    '15' : 'Independent',
-    '8' : 'Kleenheat',
-    '9' : 'Kwikfuel',
-    '10' : 'Liberty',
-    '30' : 'Metro Petroleum',
-    '11' : 'Mobil',
-    '13' : 'Peak',
-    '26' : 'Puma',
-    '14' : 'Shell',
-    '23' : 'United',
-    '27' : 'Vibe',
-    '31' : 'WA Fuels',
-    '16' : 'Wesco',
-}
+        If an invalid parameter is given it will default to unleaded petrol in the Perth Metro area
+    """
 
-class FuelData:
+    options = ''
+    if kwargs.get('Tomorrow'):
+        options += '&Day=tomorrow'
+   
+    if 'Product' in kwargs:
+        options += '&Product=' + str(kwargs['Product'])
+   
+    if 'Suburb' in kwargs:
+        options += '&Suburb=' + quote_plus(kwargs['Suburb'])
 
-    def __init__(self, day=None):
-        for d in Days:
-            if day == d:
-                self.day = day
-        if self.day == None:
-            raise AttributeError("FuelData object requires the parameter yesterday, today or tomorrow")
+    if 'Surrounding' in kwargs:
+        options += '&Surrounding=' + kwargs['Surrounding']
 
-        self.dataStore = {
-            'Type': 'File',
-            'Root': './data/',
-            'File': "fuelData_" + self.day + ".json",
-            
-        }
-        self.dataStore['Location'] = self.dataStore['Root'] + self.dataStore['File']
+    if 'Region' in kwargs:
+        options += '&Region=' + str(kwargs['Region'])
 
-        self.cacheFile = Path(self.dataStore['Location'])
+    if 'StateRegion' in kwargs:
+        options += '&StateRegion=' + str(kwargs['StateRegion'])
 
-        self.data = []
-        self.renew()
+    return parse('https://www.fuelwatch.wa.gov.au/fuelwatch/fuelWatchRSS?' + options)
 
-    def __del__(self):
-        if(self.cacheFile.exists()):
-            self.cacheFile.unlink()
-        self.data = []
-    
-    def renew(self):
-        #If writing returns false the data exists so just read it from file
-        if(not self.writeCache()):
-            self.data = self.readCache()
+def tomorrowReleased():
+    """Check if tomorrows data is released
 
-        #Fail if there is no data except for tomorrows data when it hasn't been released.
-        if(self.data == []):
-            if(self.day == 'tomorrow' and self.tomorrowReleased()):
-                raise e.cacheFailureException("Failed to write cache")
-            elif(not self.day == 'tomorrow' ):
-                raise e.cacheFailureException("Failed to write cache")
+    Tomorrows fuel data is released after 2:30pm.
+    """
 
-    def getPrices(self, product_id: str, suburb='',  brand='', surrounding=False):
-        """Get fuel prices from FuelWatch.WA.gov.au
+    now = datetime.now().time()
+    afterToothHurty = now.replace(hour=14, minute=30, second=0, microsecond=0)
 
-        Parameters
-        ----------
-        day : str
-            The fuel type ID
-        suburb : str, optional
-            The suburb to get fuel prices for 
-        brand : str, optional
-            Brand of fuel
-        surrounding : bool, optional
-            Whether to include surrounding areas to the above suburb (Default is false).
-        """
+    return now > afterToothHurty
 
-        options = 'Product=' + product_id
-        options += '&Day=' + self.day
-        
-        if suburb != '':
-            options += '&Suburb=' + suburb
-
-        if surrounding:
-            options += '&Surrounding=yes'
-
-        return parse('https://www.fuelwatch.wa.gov.au/fuelwatch/fuelWatchRSS?' + options)
-
-    def getFuelData(self):
-        """Builds a list of fuel data
-        Collects fueldata.
-        """
-
-        self.data = []
-
-        for ft in FuelTypes:
-            fDict = dict()
-            fDict['fuelType'] = ft
-
-            #Get this day and fueltypes prices then sort by lowest price
-            scrape = list()
-            scrape = self.getPrices(product_id=str(ft))
-            s=sorted(scrape['items'], key=lambda item : item['price'], reverse=False)
-
-            #Build new list of service station dictionaries containing just the required data
-            sList = list()
-            for i in s:
-                servo = dict()
-                servo = {
-                    'fuelType' : ft,
-                    'price' : i['price'],
-                    'brand' : i['brand'],
-                    'trading-name' : i['trading-name'],
-                    'location' : i['location'],
-                    'address' : i['address'],
-                    'longitude' : i['longitude'],
-                    'latitude' : i['latitude'],
-                }
-                sList.append(servo)
-                
-            fDict['stations'] = sList
-            self.data.append(fDict)
-
-    def filterData(self, parameters={}):
-
-        try:   
-
-            if 'FuelType' not in parameters:
-                ftIndex = 0
-            else:
-                if parameters['FuelType'] not in FuelTypes.values():
-                    raise KeyError
-
-                fv = collections.OrderedDict(sorted(FuelTypes.items()))
-                for i,(k,v) in enumerate(fv.items()):
-                    if(v == parameters['FuelType']):
-                        ftIndex = i
-
-        except KeyError as err:
-            print('Invalid fuel type given. Valid options are:')
-            for i in FuelTypes: 
-                print(FuelTypes[i])
-            raise
-        
-        #Check if the requested number of items doesn't exceed the number items that exist.
-        #Set count to the lowest option.
-        count = len(self.data[ftIndex]['stations']) 
-        if 'Count' in parameters:
-            if parameters['Count'] < count:
-                count = parameters['Count']
-
-        filterData = list()
-
-        filterData = self.data[ftIndex]['stations'][0:count]
-        return filterData
-
-    def tomorrowReleased(self):
-        """Check if tomorrows data is released
-
-        Tomorrows fuel data is released after 2:30pm.
-        """
-
-        now = datetime.now().time()
-        afterToothHurty = now.replace(hour=14, minute=30, second=0, microsecond=0)
-
-        return now > afterToothHurty
-        
-    def writeCache(self):
-
-        '''
-            Check if the cache file already exists
-            If it does confirm that the file isn't stale data that can be used
-            Current data will cause the write to not happen.
-
-            Tomorrows data should also only exist if it's between 1430 and 0000 the next day
-            Therefore remove it if it exists outside of that timeframe and exit.
-        '''
-
-        if(self.cacheFile.exists()):
-            dayStart = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-            dayEnd = dayStart + timedelta(days=1)
-            ytdStart = dayStart + timedelta(days=-1)
-
-            f_ctime = datetime.fromtimestamp(self.cacheFile.stat().st_ctime)
-
-            if(self.day == 'today'):
-                if(f_ctime >= dayStart and f_ctime < dayEnd):
-                    return False
-
-            elif(self.day == 'yesterday'):
-                if(f_ctime > ytdStart):
-                    return False
-                
-            elif(self.day == 'tomorrow'):
-                if(self.tomorrowReleased() and f_ctime < dayEnd):
-                    return False
-                else: #Tomorrow hasn't been released so the file should be removed
-                    self.cacheFile.unlink()
-                    return True #Return success so an attempt isn't made to read cache
-        #No file exists for Tomorrow but it hasn't been released so exit.
-        elif(self.day == 'tomorrow' and not self.tomorrowReleased()):
-            return True
-
-        # No valid file found so get the data from FuelWatch and store it.
-        self.getFuelData()
-
-        with open(self.dataStore['Location'], "w") as fuelFile:
-            json.dump(self.data, fuelFile)
-        return True
-
-    def readCache(self):
-        if(self.cacheFile.exists()):
-            with open(self.dataStore['Location'], "r") as fuelFile:
-                return json.load(fuelFile)
-        return []
-
-    def nearByServo(self, data, userLocation, distance):
-        return [
-            servo
-            for servo in data if geopy.distance.distance(userLocation,(servo['latitude'],servo['longitude'])).km < distance
-        ]
+def tomorrow():
+    return (datetime.now() + timedelta(days=1))
