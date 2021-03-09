@@ -24,6 +24,7 @@ setup(
         'geocoder',
         'schedule',
         'dataclasses,'
-        'airium'
+        'airium',
+        'sqlite3'
     ],
 )
