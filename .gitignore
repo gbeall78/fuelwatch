@@ -147,9 +147,9 @@ dmypy.json
 
 # Custom rules (everything added below won't be overriden by 'Generate .gitignore File' if you use 'Update' option)
 
-/data/*
-info
+db/fuelwatch.db
+Info
 *.swp
 .DS_Store
 profile.txt
-
+tests/
