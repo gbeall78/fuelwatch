@@ -22,7 +22,7 @@ setup(
         'pytest',
         'geopy',
         'geocoder',
-        'schedule',
+        'apscheduler',
         'dataclasses,'
         'airium',
         'sqlite3'

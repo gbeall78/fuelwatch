@@ -171,6 +171,10 @@ def recordPrices(*args, **kwargs):
         else:
             return False
 
+    #If data already exists dont continue
+    if c.execute('SELECT count(*) FROM price where price_date=?;', [date]).fetchone()[0]:
+        return False
+
     '''
         For each fuel type get data from all regions.
         Check each data item against the list of servos
