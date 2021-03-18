@@ -375,11 +375,19 @@ def checkPricesExist(*args, **kwargs):
 
 if __name__ == '__main__':
 
-    #Running module by itself will record todays and tomorrows prices
+    #Running module by itself will check if the database is valid and create it if it isn't.
+    # Todays and tomorrows prices will then be recorded if they don't exist
+    try:
+        dbDataCheck()
+    except databaseTableException:
+        print('Database invalid - Recreating')
+        initFuelwatchDB()
+    finally:
+        if not checkPricesExist():
+            print('Recording todays prices')
+            recordPrices(True)
 
-    if(not checkPricesExist()):
-        recordPrices(True)
-
-    if(not checkPricesExist(tomorrow())):
-        if tomorrowReleased():
-            recordPrices()
+        if not checkPricesExist(tomorrow()):
+            if tomorrowReleased():
+                print('Recording tomorrows prices')
+                recordPrices()
