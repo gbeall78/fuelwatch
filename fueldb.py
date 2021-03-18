@@ -379,7 +379,7 @@ if __name__ == '__main__':
     # Todays and tomorrows prices will then be recorded if they don't exist
     try:
         dbDataCheck()
-    except databaseTableException:
+    except:
         print('Database invalid - Recreating')
         initFuelwatchDB()
     finally:
