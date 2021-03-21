@@ -23,7 +23,7 @@ setup(
         'geopy',
         'geocoder',
         'apscheduler',
-        'dataclasses,'
+        'dataclasses',
         'airium',
         'sqlite3'
     ],
