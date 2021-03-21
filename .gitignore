@@ -150,6 +150,7 @@ dmypy.json
 db/fuelwatch.db
 Info
 *.swp
+*.log
 .DS_Store
 profile.txt
 tests/

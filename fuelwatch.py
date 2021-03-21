@@ -10,6 +10,11 @@ from fuelData import tomorrowReleased,tomorrow
 from htmlBuilder import fuelTable
 from userData import UserData
 
+import logging
+
+logging.basicConfig(filename="./fuelwatch.log")
+logging.getLogger('apscheduler').setLevel(logging.DEBUG)
+
 app = Flask(__name__)
 
 user = UserData()
@@ -62,14 +67,11 @@ def buildPage():
         TMRW_DIESEL = None if not tomorrowReleased() else Markup(fuelTable(searchServo(Product=4,Date=tomorrow(),Near=servos,Limit=limit))),
         TMRW_LPG = None if not tomorrowReleased() else Markup(fuelTable(searchServo(Product=5,Date=tomorrow(),Near=servos,Limit=limit))),
         Search_result = None if searchResult == {} else Markup(fuelTable(searchServo(**searchResult,Limit=20)))
-    )
-
+)
 
 if __name__ == '__main__':
-
     recordPrices(True)
     sched = BackgroundScheduler(daemon=True)
-    sched.add_job(func=recordPrices, trigger="cron", hour=14, minute=31)
+    sched.add_job(recordPrices, 'cron', hour=14, minute="30-40/2", second=30)
     sched.start()
-    
     app.run(debug=True, host='0.0.0.0')
