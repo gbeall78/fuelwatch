@@ -69,9 +69,12 @@ def buildPage():
         Search_result = None if searchResult == {} else Markup(fuelTable(searchServo(**searchResult,Limit=20)))
 )
 
-if __name__ == '__main__':
+def startup(*args, **kwargs):
     recordPrices(True)
     sched = BackgroundScheduler(daemon=True)
     sched.add_job(recordPrices, 'cron', hour=14, minute="30-40/2", second=30)
     sched.start()
+
+if __name__ == '__main__':
+    startup()
     app.run(debug=True, host='0.0.0.0')
