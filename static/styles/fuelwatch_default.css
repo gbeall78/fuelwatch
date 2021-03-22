@@ -1,4 +1,4 @@
-body {
+body, .blue-background {
   background-color: rgb(228, 237, 243);
 }
 
@@ -96,4 +96,33 @@ button[type=submit] {
   /*when navigating through the items using the arrow keys:*/
   background-color: DodgerBlue !important;
   color: #ffffff;
+}
+
+/* The Close Button */
+.close {
+  color: black;
+  position: absolute;
+  top: 10px;
+  right: 25px;
+  font-size: 35px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #999;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.cursor {
+  cursor: pointer;
+}
+
+.search-button,
+.search-button:active,
+.search-button:focus,
+.search-button:hover {
+  background: transparent!important;
+  border: transparent!important;
 }

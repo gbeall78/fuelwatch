@@ -18,7 +18,6 @@ logging.getLogger('apscheduler').setLevel(logging.DEBUG)
 app = Flask(__name__)
 
 user = UserData()
-searchResult = {}
 suburbs = '["' + '","'.join(getSuburbs()) + '"]' 
 
 @app.route('/get_location')
@@ -30,13 +29,12 @@ def getUserLocation():
 @app.route('/search', methods=['GET', 'POST'])
 def searchForm():
     if request.method == "POST":
-        searchResult.clear()
-        searchResult.update(request.form.to_dict())
+        searchResult = request.form.to_dict()
+        return str(Markup(fuelTable(searchServo(**searchResult,Limit=20))))
+    
 
-    return redirect(url_for('buildPage'))
-
-@app.route('/')
-@app.route('/index')
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/index', methods=['GET', 'POST'])
 def buildPage():
 
     radiusChoices = [2,3,5,10,15]
@@ -66,7 +64,6 @@ def buildPage():
         TMRW_RON98 = None if not tomorrowReleased() else Markup(fuelTable(searchServo(Product=6,Date=tomorrow(),Near=servos,Limit=limit))),
         TMRW_DIESEL = None if not tomorrowReleased() else Markup(fuelTable(searchServo(Product=4,Date=tomorrow(),Near=servos,Limit=limit))),
         TMRW_LPG = None if not tomorrowReleased() else Markup(fuelTable(searchServo(Product=5,Date=tomorrow(),Near=servos,Limit=limit))),
-        Search_result = None if searchResult == {} else Markup(fuelTable(searchServo(**searchResult,Limit=20)))
 )
 
 recordPrices(True)
