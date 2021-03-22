@@ -1,3 +1,7 @@
+function searchOutput(data){
+    document.getElementById("searchForm").reset();
+    $("#searchResult").html(data);
+}
 function search(e) {
     e.preventDefault();
     console.log('e', e);
@@ -9,7 +13,7 @@ function search(e) {
         contentType: false,
         data: formdata,
         success: function(response){
-            $("#searchResult").html(response);
+            searchOutput(response);
         }
     });
 }
