@@ -214,9 +214,7 @@ def nearByServo(*args, **kwargs):
             raise TypeError('Latlng must be a tuple')
         
         #Default distance if not specified or invalid distance given
-        distance = 5    
-        if type(kwargs.get('Distance')) is int:
-            distance = kwargs['Distance']
+        distance = kwargs['Distance'] if type(kwargs.get('Distance')) is int else 5
 
         #latLng = c.execute('Select latitude,longitude from servo;').fetchall()
         latLng = c.execute('Select latitude,longitude from servo ss inner join suburb sb on sb.suburb_id=ss.suburb_id inner join state_region r on r.state_region_id=sb.state_region_id  where sb.state_region_id=98;').fetchall()

@@ -3,12 +3,12 @@ from flask import Flask, request, render_template, jsonify, Markup,redirect,url_
 import time
 import threading
 from apscheduler.schedulers.background import BackgroundScheduler
+from geopy.geocoders import Nominatim
 
 from fueldb import searchServo,recordPrices,nearByServo,getSuburbs,checkPricesExist
 import fuelwatch_codes as fc
 from fuelData import tomorrowReleased,tomorrow
 from htmlBuilder import fuelTable
-from userData import UserData
 
 import logging
 
@@ -17,53 +17,75 @@ logging.getLogger('apscheduler').setLevel(logging.DEBUG)
 
 app = Flask(__name__)
 
-user = UserData()
+limit = 5
 suburbs = '["' + '","'.join(getSuburbs()) + '"]' 
 
-@app.route('/get_location')
-def getUserLocation():
-    user.latlng = (request.args.get('lat'), request.args.get('lng'))
-    user.updateLocation()
-    return redirect(url_for('buildPage'))
+def getUserLocationData(*args, **kwargs):
+    userLatlng = kwargs['LatLng'] if 'LatLng' in kwargs else (-31.950527, 115.860458)
+    servos = nearByServo(
+        Latlng = userLatlng,
+        Distance = kwargs['Radius'] if 'Radius' in kwargs else 5
+    )
+
+    if tomorrowReleased():
+        tomorrowData = (
+                Markup(fuelTable(searchServo(Date=tomorrow(),Near=servos,Limit=limit))) +
+                Markup(fuelTable(searchServo(Product=2,Date=tomorrow(),Near=servos,Limit=limit))) +
+                Markup(fuelTable(searchServo(Product=6,Date=tomorrow(),Near=servos,Limit=limit))) +
+                Markup(fuelTable(searchServo(Product=4,Date=tomorrow(),Near=servos,Limit=limit))) +
+                Markup(fuelTable(searchServo(Product=5,Date=tomorrow(),Near=servos,Limit=limit)))
+        )
+    else:
+        tomorrowData = Markup('<h3>Tomorrows prices will be released after 2:30pm WAST.</h3>')
+
+    todayData = (
+        Markup(fuelTable(searchServo(Near=servos,Limit=limit))) +
+        Markup(fuelTable(searchServo(Product=2,Near=servos,Limit=limit))) +
+        Markup(fuelTable(searchServo(Product=6,Near=servos,Limit=limit))) +
+        Markup(fuelTable(searchServo(Product=4,Near=servos,Limit=limit))) +
+        Markup(fuelTable(searchServo(Product=5,Near=servos,Limit=limit)))
+    )
+
+    locator = Nominatim(user_agent="myGeocoder")
+    return {
+        'today':todayData,
+        'tomorrow':tomorrowData, 
+        'suburb' : locator.reverse(userLatlng).raw['address']['suburb']
+    }
+
+@app.route('/get_location', methods=['GET'])
+def getLocation():
+    print("Get Location called.")
+    print("Radius:" + str(request.args['radius']))
+    print("LatLng: " + request.args.get('lat') + " " + request.args.get('lng'))
+    return jsonify(getUserLocationData(
+        LatLng = (request.args.get('lat'), request.args.get('lng')),
+        Radius = int(request.args['radius']) if 'radius' in request.args else None
+    ))
 
 @app.route('/search', methods=['GET', 'POST'])
 def searchForm():
     if request.method == "POST":
         searchResult = request.form.to_dict()
-        return str(Markup(fuelTable(searchServo(**searchResult,Limit=20))))
+        return Markup(fuelTable(searchServo(**searchResult,Limit=20)))
     
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 def buildPage():
-
-    radiusChoices = [2,3,5,10,15]
     radius = 5
-    limit = 5
+    radiusChoices = [2,3,5,10,15]
 
-    if('radius' in request.args):
-        radius = int(request.args['radius'])
-
-    #Lookups are expensive so we do this once to get the servos close to the user and then pass that data.
-    servos = nearByServo(Latlng=user.latlng, Distance=radius)
+    initData = getUserLocationData()
     return render_template('index.html',
         RadiusChoices = radiusChoices,
         Radius = radius,
-        UserLocation = user.location.raw['address']['suburb'],
         Suburbs = suburbs,
         Regions = fc.Regions,
         StateRegions = fc.StateRegions,
         Brands = fc.FuelBrands,
-        ULP = Markup(fuelTable(searchServo(Near=servos,Limit=limit))),
-        PULP = Markup(fuelTable(searchServo(Product=2,Near=servos,Limit=limit))),
-        RON98 = Markup(fuelTable(searchServo(Product=6,Near=servos,Limit=limit))),
-        DIESEL = Markup(fuelTable(searchServo(Product=4,Near=servos,Limit=limit))),
-        LPG = Markup(fuelTable(searchServo(Product=5,Near=servos,Limit=limit))),
-        TMRW_ULP = None if not tomorrowReleased() else Markup(fuelTable(searchServo(Date=tomorrow(),Near=servos,Limit=limit))),
-        TMRW_PULP = None if not tomorrowReleased() else Markup(fuelTable(searchServo(Product=2,Date=tomorrow(),Near=servos,Limit=limit))),
-        TMRW_RON98 = None if not tomorrowReleased() else Markup(fuelTable(searchServo(Product=6,Date=tomorrow(),Near=servos,Limit=limit))),
-        TMRW_DIESEL = None if not tomorrowReleased() else Markup(fuelTable(searchServo(Product=4,Date=tomorrow(),Near=servos,Limit=limit))),
-        TMRW_LPG = None if not tomorrowReleased() else Markup(fuelTable(searchServo(Product=5,Date=tomorrow(),Near=servos,Limit=limit))),
+        Today = initData['today'],
+        Tomorrow = initData['tomorrow'],
 )
 
 recordPrices(True)

@@ -13,104 +13,91 @@
         <button class="tablinks w3-third" onclick="openPage(event, 'tomorrow')">Tomorrows prices</button>
         <button class="tablinks w3-third" onclick="openPage(event, 'trends')">Trends</button>
     </div>
-        <div id="search" class="w3-modal w3-animate-opacity">
-            <div class="w3-modal-content">
-                <form autocomplete="off" id="searchForm" name="searchform" class="w3-container" method="POST">
-                    <div class="w3-display-container w3-row-padding w3-margin-left" style="margin: 10px 0 70px 0">
-                        <span onclick="document.getElementById('search').style.display='none'" class="close cursor w3-button w3-display-topright" style="right: 0px">&times;</span>
-                    </div>
-                    <div class="w3-display-container w3-row-padding">
-                        <div class="search autocomplete w3-half w3-container w3-left">
-                            <input id="suburb" type="text" name="Suburb" placeholder="suburb">
-                        </div>
-                        <div class="search w3-half w3-container w3-right">
-                            <input type="checkbox" name="Surrounding" id="surrounding" value="1">
-                            <label for="surrounding">Surrounding suburbs</label>
-                        </div>
-                    </div>
-                    <div class="w3-row-padding w3-display-container">
-                        <div class="search w3-half w3-container w3-left">
-                            <select name="Product" id="fueltype" class="w3-select">
-                                <option value="" disabled selected>Fuel type</option>
-                                <option value="1">Unleaded</option>
-                                <option value="2">Premium</option>
-                                <option value="4">Diesel</option>
-                                <option value="5">LPG</option>
-                                <option value="6">98 RON</option>
-                                <option value="10">E85</option>
-                            </select>
-                        </div>
-                        <div class="search w3-half w3-container w3-right">
-                            <select name="Brand" id="brand" class="w3-select">
-                                <option value="" disabled selected>Fuel brand</option>
-                                {% for key,value in Brands.items() %}
-                                <option value="{{ key }}">{{ value }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div>
-                    <div class="w3-row-padding w3-display-container">
-                        <div class="search w3-half w3-container w3-left">
-                            <select name="Region" id="region" class="w3-select">
-                                <option value="" disabled selected>WA Region</option>
-                                {% for key,value in Regions.items() %}
-                                <option value="{{ key }}">{{ value }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="search w3-half w3-container w3-right">
-                            <select name="StateRegion" id="stateRegion" class="w3-select">
-                                <option value="" disabled selected>WA State region</option>
-                                {% for key,value in StateRegions.items() %}
-                                <option value="{{ key }}">{{ value }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div>
-                    <button type="submit" class=" w3-btn w3-block w3-large w3-round-large w3-wide" form="searchForm" value="Search">Search</button>
-                    <script>
-                        var suburbs = $('#suburb-data').data("suburbs");
-                        autocomplete(document.getElementById("suburb"), suburbs);
-                    </script>
-                </form>
-                <div class="w3-margin-left" style="margin-top:50px"></div>
-                <div id="searchResult" class="w3-container">
+    <div id="search" class="w3-modal w3-animate-opacity">
+        <div class="w3-modal-content">
+            <form autocomplete="off" id="searchForm" name="searchform" class="w3-container" method="POST">
+                <div class="w3-display-container w3-row-padding w3-margin-left" style="margin: 10px 0 70px 0">
+                    <span onclick="document.getElementById('search').style.display='none'" class="close cursor w3-button w3-display-topright" style="right: 0px">&times;</span>
                 </div>
+                <div class="w3-display-container w3-row-padding">
+                    <div class="search autocomplete w3-half w3-container w3-left">
+                        <input id="suburb" type="text" name="Suburb" placeholder="suburb">
+                    </div>
+                    <div class="search w3-half w3-container w3-right">
+                        <input type="checkbox" name="Surrounding" id="surrounding" value="1">
+                        <label for="surrounding">Surrounding suburbs</label>
+                    </div>
+                </div>
+                <div class="w3-row-padding w3-display-container">
+                    <div class="search w3-half w3-container w3-left">
+                        <select name="Product" id="fueltype" class="w3-select">
+                            <option value="" disabled selected>Fuel type</option>
+                            <option value="1">Unleaded</option>
+                            <option value="2">Premium</option>
+                            <option value="4">Diesel</option>
+                            <option value="5">LPG</option>
+                            <option value="6">98 RON</option>
+                            <option value="10">E85</option>
+                        </select>
+                    </div>
+                    <div class="search w3-half w3-container w3-right">
+                        <select name="Brand" id="brand" class="w3-select">
+                            <option value="" disabled selected>Fuel brand</option>
+                            {% for key,value in Brands.items() %}
+                            <option value="{{ key }}">{{ value }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="w3-row-padding w3-display-container">
+                    <div class="search w3-half w3-container w3-left">
+                        <select name="Region" id="region" class="w3-select">
+                            <option value="" disabled selected>WA Region</option>
+                            {% for key,value in Regions.items() %}
+                            <option value="{{ key }}">{{ value }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="search w3-half w3-container w3-right">
+                        <select name="StateRegion" id="stateRegion" class="w3-select">
+                            <option value="" disabled selected>WA State region</option>
+                            {% for key,value in StateRegions.items() %}
+                            <option value="{{ key }}">{{ value }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class=" w3-btn w3-block w3-large w3-round-large w3-wide" form="searchForm" value="Search">Search</button>
+                <script>
+                    var suburbs = $('#suburb-data').data("suburbs");
+                    autocomplete(document.getElementById("suburb"), suburbs);
+                </script>
+            </form>
+            <div class="w3-margin-left" style="margin-top:50px"></div>
+            <div id="searchResult" class="w3-container">
             </div>
         </div>
+    </div>
     <div id="today" class="tabcontent w3-container w3-animate-opacity">
-        <form >
+        <form id="radiusForm">
             <h3>Fuel prices within a 
-                <select name="radius" onchange="this.form.submit()">
+                <select name="radiusChoice" id="radiusChoice">
                     {% for r in RadiusChoices %}
                         <option value="{{ r }}" {% if r == Radius %}selected{% endif %}>{{ r }}</option>
                     {% endfor %}
                 </select> 
-            KM radius of {{ UserLocation }}</h3>
-            {{ ULP }}
-            {{ PULP }}
-            {{ RON98 }}
-            {{ DIESEL }}
-            {{ LPG }}
+            KM radius of <span id="userSuburb"></span></h3>
+            <div id="todayData">{{ Today }}</div>
         </form>
     </div>
     <div id="tomorrow" class="tabcontent w3-container w3-animate-opacity">
-        {% if TMRW_ULP %}
-            {{ TMRW_ULP }}
-            {{ TMRW_PULP }}
-            {{ TMRW_RON98 }}
-            {{ TMRW_DIESEL }}
-            {{ TMRW_LPG }}
-        {% else %}
-            <h3>Tomorrows prices will be released after 2:30pm WAST.</h3>
-        {% endif %}
+        {{ Tomorrow }}
     </div>
      <script>
         // Get the element with id="defaultOpen" and click on it
         document.getElementById("defaultOpen").click();
-        console.log('serac', search)
         $(document.getElementById("searchForm")).on('submit', search);
+        $(document.getElementById("radiusForm")).on('change', updateRadius);
     </script>
 </body>
-</html>
 {% endblock %}
